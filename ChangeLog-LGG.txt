@@ -15,3 +15,6 @@ Changelog
 
 1.31.0.1
 	Added code to avoid NullRefs during KSP bootup
+
+1.31.0.2
+	Updated bulkheadprofile for the CRY-0300RFreezer to srf instead of size1
