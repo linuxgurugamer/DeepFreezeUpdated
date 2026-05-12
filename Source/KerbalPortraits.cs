@@ -63,33 +63,15 @@ namespace DeepFreeze
         {
             if (!checkName)
             {
-#if false
-                for (int i = 0; i < KerbalPortraitGallery.Instance.ActiveCrew.Count; ++i)
-                {
-                    if (KerbalPortraitGallery.Instance.ActiveCrew[i] == crew)
-                        return true;
-                }
-#endif
-
                 for (int i = 0; i < activeCrew.Count; ++i)
                 {
                     if (activeCrew[i].kerbal == crew)
                         return true;
                 }
-
-
                 return false;
             }
             else
             {
-#if false
-                for (int i = 0; i < KerbalPortraitGallery.Instance.ActiveCrew.Count; ++i)
-                {
-                    if (KerbalPortraitGallery.Instance.ActiveCrew[i].crewMemberName == crew.crewMemberName)
-                        return true;
-                }
-#endif
-
                 for (int i = 0; i < activeCrew.Count; ++i)
                 {
                     if (activeCrew[i].kerbal.crewMemberName == crew.crewMemberName)
@@ -114,18 +96,6 @@ namespace DeepFreeze
             kerbal.SetVisibleInPortrait(false);
             kerbal.state = Kerbal.States.NO_SIGNAL;
             //Loop through the ActiveCrew portrait List
-#if false
-            for (int i = KerbalPortraitGallery.Instance.ActiveCrew.Count - 1; i >= 0; i--)
-            {
-                //If we find an ActiveCrew entry where the crewMemberName is equal to our kerbal's
-                if (KerbalPortraitGallery.Instance.ActiveCrew[i].crewMemberName == kerbal.crewMemberName)
-                {
-                    //we Remove them from the list.
-                    KerbalPortraitGallery.Instance.ActiveCrew.RemoveAt(i);
-                }
-            }
-#endif
-
             for (int i = activeCrew.Count - 1; i >= 0; i--)
             {
                 //If we find an ActiveCrew entry where the crewMemberName is equal to our kerbal's

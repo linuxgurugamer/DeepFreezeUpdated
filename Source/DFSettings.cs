@@ -35,7 +35,9 @@ namespace DF
         //internal float CFwindowPosY ;
         internal float DFKACwindowPosX ;
         internal float DFKACwindowPosY ;
+#if falsae
         internal bool UseAppLauncher ;
+#endif
         internal bool debugging ;
         internal bool ECreqdForFreezer ;
         internal bool backgroundresources;
@@ -76,7 +78,6 @@ namespace DF
             //CFwindowPosY = 140;
             DFKACwindowPosX = 600;
             DFKACwindowPosY = 50;
-            UseAppLauncher = true;
             debugging = true;
             ECreqdForFreezer = true;
             backgroundresources = true;
@@ -201,15 +202,6 @@ namespace DF
                     backgroundresources = DF_SettingsParms.backgroundresources;
                     fatalOption = DF_SettingsParms.fatalOption;
                     comatoseTime = DF_SettingsParms.comatoseTime;
-                    if (UseAppLauncher != DF_SettingsParms_Sec3.UseAppLToolbar)
-                    {
-                        UseAppLauncher = DF_SettingsParms_Sec3.UseAppLToolbar;
-
-                        if (GUI != null)
-                        {
-                            GUI.DFMenuAppLToolBar.chgAppIconStockToolBar(UseAppLauncher);
-                        }
-                    }
                     debugging = DF_SettingsParms_Sec3.DebugLogging;
                     RSTUtils.Utilities.debuggingOn = debugging;
                     ToolTips = DF_SettingsParms_Sec3.ToolTips;

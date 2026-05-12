@@ -35,3 +35,4 @@ Mod Contributors:
 ===========
 JPLRepo - Plugin design and development, C# coding, Implementation and releases.    
 MerlinsMaster - Graphic design, 3D Models, textures.
+Linuxgurugamer - Bug fixes and support

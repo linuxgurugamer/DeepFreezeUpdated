@@ -158,9 +158,7 @@ namespace DF
                 children.Add(DFMem);
                 var child = gameObject.AddComponent<DeepFreezeGUI>();
                 children.Add(child);
-            }
-
-            
+            }            
         }
 
         public override void OnLoad(ConfigNode gameNode)
@@ -241,6 +239,8 @@ namespace DF
         protected void OnGameSceneLoadRequested(GameScenes gameScene)
         {
             //RSTUtils.Utilities.Log("Game scene load requested: " + gameScene);
+            if (DeepFreezeGUI.Instance != null)
+                DeepFreezeGUI.Instance.UpdateToolbar();
         }
 
         protected void DeepFreezeEventAdd()
@@ -512,13 +512,14 @@ namespace DF
 
         #endregion Events
 
-        #region Assembly/Class Information
-
+#region Assembly/Class Information
+#if false
         /// <summary>
         /// Name of the Assembly that is running this MonoBehaviour
         /// </summary>
         internal static String _AssemblyName
         { get { return Assembly.GetExecutingAssembly().GetName().Name; } }
+#endif
 
         /// <summary>
         /// Full Path of the executing Assembly
@@ -532,7 +533,7 @@ namespace DF
         internal static String _AssemblyFolder
         { get { return Path.GetDirectoryName(_AssemblyLocation).Replace("\\", "/");  } }
 
-        #endregion Assembly/Class Information
+#endregion Assembly/Class Information
     }
 
     internal interface Savable

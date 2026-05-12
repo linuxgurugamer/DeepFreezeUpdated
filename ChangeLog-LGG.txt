@@ -24,3 +24,9 @@ Changelog
 	Fixed problem in status window which causes huge FPS drop with a large number of kerbals.  On a 9850X3D system with 20 kerbals in freeze chambers, caused a 72% drop in FPS, from 180 down to 70
 	Replaced obsolete call to KerbalPortraitGallery.ActiveCrew with Reflection code to get the protected list KerbalPortraitGallery.activeCrew (a bit of an optimization)
 
+1.32.0
+	Release version
+	Cleanup of code
+	Added support for ClickThroughBlocker
+	Added support for ToolbarController, removing about 1000 lines of code and simplifying the mod
+		Both require new dependencies of the above

@@ -47,7 +47,14 @@
     <Reference Include="BackgroundResources">
       <HintPath>$(KSPDIR)\GameData\REPOSoftTech\BackgroundResources\BackgroundResources.dll</HintPath>
     </Reference>
+    <Reference Include="ClickThroughBlocker">
+      <HintPath>R:\KSP\KSP_1.12.5-dev\GameData\000_ClickThroughBlocker\Plugins\ClickThroughBlocker.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="ToolbarControl, Version=0.1.9.14, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>R:\KSP\KSP_1.12.5-dev\GameData\001_ToolbarControl\Plugins\ToolbarControl.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="APIs\DFGameEvents.cs" />

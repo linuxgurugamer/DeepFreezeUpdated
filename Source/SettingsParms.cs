@@ -231,13 +231,6 @@ namespace DF
         
         public override bool Interactible(MemberInfo member, GameParameters parameters)
         {
-            if (member.Name == "UseAppLToolbar")
-            {
-                if (RSTUtils.ToolbarManager.ToolbarAvailable)
-                    return true;
-                return false;
-            }
-
             return true;
         }
     }

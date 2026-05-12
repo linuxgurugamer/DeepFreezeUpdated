@@ -124,6 +124,7 @@ namespace DF
             GameEvents.onVesselCreate.Add(onVesselCreate);
             GameEvents.onPartCouple.Add(onPartCouple);
             GameEvents.onGUIEngineersReportReady.Add(AddTests);
+
             if (DFGameEvents.onKerbalFreezing != null)
             {
                 DFGameEvents.onKerbalFreezing.Add(ThawFreezeStart);
@@ -209,6 +210,7 @@ namespace DF
             GameEvents.onVesselCreate.Remove(onVesselCreate);
             GameEvents.onPartCouple.Remove(onPartCouple);
             GameEvents.onGUIEngineersReportReady.Remove(AddTests);
+
             if (DFGameEvents.onKerbalFreezing != null)
             {
                 DFGameEvents.onKerbalFreezing.Remove(ThawFreezeStart);

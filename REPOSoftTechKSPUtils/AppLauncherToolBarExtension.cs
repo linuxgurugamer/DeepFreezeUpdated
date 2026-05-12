@@ -18,9 +18,11 @@
  *  along with RST Utils.  If not, see <http://opensource.org/licenses/MIT>.
  *
  */
-using System;
+using KSP.Localization;
 using KSP.UI.Screens;
-using UnityEngine; 
+using System;
+using ToolbarControl_NS;
+using UnityEngine;
 
 namespace RSTUtils
 {
@@ -28,18 +30,7 @@ namespace RSTUtils
     {
         public static AppLauncherToolBar Instance { get; private set; }
 
-        private bool usingToolbar = false; //Set to true if user is using ToolBar
-        private IButton button1;  //ToolBar button
-        private string toolBarName;  //set to Name for button on ToolBar (modname)
-        private string toolBarToolTip; // set tooltip for ToolBar button
-        private string toolBarTexturePath; //The TooBar formatted Texture Path
-        private GameScenesVisibility toolBarGameScenes; //GameScenes toolbar button can be seen in
-
-        private bool usingStock = false; //Set to true if user is using Stock AppLauncher
-        private ApplicationLauncherButton stockToolbarButton; // Stock Toolbar Button
         private ApplicationLauncher.AppScenes VisibleinScenes; //What scenes is the applauncher button seen in
-        private UnityEngine.Texture appbtnTexON; //Texture for AppLauncher button when ON
-        private UnityEngine.Texture appbtnTexOFF; //Texture for AppLauncher button when OFF
         private bool showHoverText = false; //Whether to show AppLauncher Hover Text or not.
 
         private bool _gamePaused;
@@ -62,25 +53,6 @@ namespace RSTUtils
             }
         }
 
-        public bool StockButtonNotNull
-        {
-            get { return stockToolbarButton != null; }
-        }
-
-        public bool ToolBarButtonNotNull
-        {
-            get { return button1 != null;  }
-        }
-
-        public bool usingToolBar
-        {
-            get { return usingToolbar; }
-        }
-
-        public bool usingAppLauncher
-        {
-            get { return usingStock; }
-        }
 
         //GuiVisibility
         private bool _Visible;
@@ -117,6 +89,7 @@ namespace RSTUtils
         {
             hideUI = false;
         }
+
         /// <summary>
         /// Constructor for AppLauncherToolBar. You need to construct one of these for your Mod Menu/GUI environment.
         /// </summary>
@@ -127,114 +100,39 @@ namespace RSTUtils
         /// <param name="appbtnTexON">Texture reference for the AppLauncher ON Icon</param>
         /// <param name="appbtnTexOFF">Texture reference for the AppLauncher OFF Icon</param>
         /// <param name="gameScenes">A list of GameScenes use for ToolBar icon visiblity</param>
-        public AppLauncherToolBar(string toolBarName, string toolBarToolTip, string toolBarTexturePath,  
+        public AppLauncherToolBar(string toolBarName, string toolBarToolTip, string toolBarTexturePath,
             ApplicationLauncher.AppScenes VisibleinScenes, UnityEngine.Texture appbtnTexON, UnityEngine.Texture appbtnTexOFF, params GameScenes[] gameScenes)
         {
-            Instance = this;
-            if (ToolbarManager.ToolbarAvailable)
-            {
-                this.toolBarName = toolBarName;
-                this.toolBarToolTip = toolBarToolTip;
-                this.toolBarTexturePath = toolBarTexturePath;
-                this.toolBarGameScenes = new GameScenesVisibility(gameScenes);
-            }
             this.VisibleinScenes = VisibleinScenes;
-            this.appbtnTexON = appbtnTexON;
-            this.appbtnTexOFF = appbtnTexOFF;
+            CreateToolbar();
         }
 
-        private void OnGUIAppLauncherReady()
+        public const string MODID = "DeepFreeze";
+        public const string MODNAME = "Deep Freeze";
+        static ToolbarControl toolbarControl;
+
+
+        private void CreateToolbar()
         {
-            Utilities.Log_Debug("OnGUIAppLauncherReady");
-            if (ApplicationLauncher.Ready)
+            if (toolbarControl == null)
             {
-                Utilities.Log_Debug("Adding AppLauncherButton");
-                stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(
+                GameObject gm = new GameObject(MODID);
+                toolbarControl = gm.gameObject.AddComponent<ToolbarControl>();
+                toolbarControl.AddToAllToolbars(
                     onAppLaunchToggle,
                     onAppLaunchToggle,
-                    onHoverOn,
-                    onHoverOff,
-                    DummyVoid,
-                    DummyVoid,
                     VisibleinScenes,
-                    appbtnTexOFF);
+                    MODID,
+                    Localizer.Format("#LOC_lTech_16"),
+                   "REPOSoftTech/DeepFreeze/Icons/DeepFreezeOn", "REPOSoftTech/DeepFreeze/Icons/DeepFreezeOff",
+                    MODNAME
+                    );
             }
-        }
-
-        private void DummyVoid()
-        {
-        }
-
-        private void onHoverOn()
-        {
-            showHoverText = true;
-        }
-        private void onHoverOff()
-        {
-            showHoverText = false;
         }
 
         public void onAppLaunchToggle()
         {
             GuiVisible = !GuiVisible;
-            if (stockToolbarButton != null)
-            {
-                stockToolbarButton.SetTexture(GuiVisible ? appbtnTexON : appbtnTexOFF);
-            }
-        }
-
-        private void DestroyToolBar()
-        {
-            if (ToolbarManager.ToolbarAvailable)
-            {
-                if (button1 != null)
-                    button1.Destroy();
-            }
-        }
-
-        private void CreateToolBar()
-        {
-            if (ToolbarManager.ToolbarAvailable)
-            {
-                button1 = ToolbarManager.Instance.add(toolBarName, "button1");
-                button1.TexturePath = toolBarTexturePath;
-                button1.ToolTip = toolBarToolTip;
-                button1.Visibility = toolBarGameScenes;
-                button1.OnClick += e => GuiVisible = !GuiVisible;
-            }
-        }
-
-        private void DestroyStockButton()
-        {
-            GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
-            if (stockToolbarButton != null)
-            {
-                ApplicationLauncher.Instance.RemoveModApplication(stockToolbarButton);
-                stockToolbarButton = null;
-            }
-        }
-
-        private void CreateStockButton()
-        {
-            Utilities.Log_Debug("Adding onGUIAppLauncher callbacks");
-            if (ApplicationLauncher.Ready)
-            {
-                if (stockToolbarButton == null)
-                    OnGUIAppLauncherReady();
-            }
-            else
-                GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
-        }
-
-        private void OnGameSceneLoadRequestedForAppLauncher(GameScenes SceneToLoad)
-        {
-            if (stockToolbarButton != null)
-            {
-                ApplicationLauncherButton[] lstButtons = UnityEngine.Object.FindObjectsOfType<ApplicationLauncherButton>();
-                Utilities.Log_Debug("TSTMenu AppLauncher: Destroying Button-Button Count:" + lstButtons.Length);
-                ApplicationLauncher.Instance.RemoveModApplication(stockToolbarButton);
-                stockToolbarButton = null;
-            }
         }
 
         /// <summary>
@@ -244,22 +142,6 @@ namespace RSTUtils
         /// <param name="stock">True if we are to use the Stock Applauncher, False to use ToolBar mod</param>
         public void Start(bool stock)
         {
-            DestroyToolBar();
-            if (ToolbarManager.ToolbarAvailable && !stock)
-            {
-                // Set up ToolBar button
-                CreateToolBar();
-                usingToolbar = true;
-                usingStock = false;
-            }
-            else
-            {
-                // Set up the stock toolbar
-                CreateStockButton();
-                usingToolbar = false;
-                usingStock = true;
-            }
-            GameEvents.onGameSceneLoadRequested.Add(OnGameSceneLoadRequestedForAppLauncher);
             GameEvents.onGamePause.Add(GamePaused);
             GameEvents.onGameUnpause.Add(GameUnPaused);
             GameEvents.onHideUI.Add(onHideUI);
@@ -272,30 +154,16 @@ namespace RSTUtils
         /// </summary>
         public void Destroy()
         {
-            DestroyToolBar();
 
             // Stock toolbar
             Utilities.Log_Debug("Removing onGUIAppLauncher callbacks");
-            
-            DestroyStockButton();
-
             if (GuiVisible) GuiVisible = !GuiVisible;
-            GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequestedForAppLauncher);
             GameEvents.onGamePause.Remove(GamePaused);
             GameEvents.onGameUnpause.Remove(GameUnPaused);
             GameEvents.onHideUI.Remove(onHideUI);
             GameEvents.onShowUI.Remove(onShowUI);
         }
 
-        /// <summary>
-        /// Sets the ToolBar Icon visible or not. To be extended in future to not require calling from Mod.
-        /// Currently it is because I haven't incorporated the mod's Setting for Whether the user wants to use Stock AppLauncher or Toolbar.
-        /// </summary>
-        /// <param name="visible">True if set to visible, false will turn it off</param>
-        public void setToolBarBtnVisibility(bool visible)
-        {
-            button1.Visible = visible;
-        }
 
         /// <summary>
         /// Sets the Applauncher Icon visible or not. To be extended in future to not require calling from Mod.
@@ -304,60 +172,13 @@ namespace RSTUtils
         /// <param name="visible">True if set to visible, false will turn it off</param>
         public void setAppLSceneVisibility(ApplicationLauncher.AppScenes visibleinScenes)
         {
-            if (VisibleinScenes != null)
-                VisibleinScenes = visibleinScenes;
-            if (stockToolbarButton != null)
-                stockToolbarButton.VisibleInScenes = VisibleinScenes;
-            if (ApplicationLauncher.Instance == null) return;
-            bool hidden = false;
-            if (ApplicationLauncher.Instance.isActiveAndEnabled && ApplicationLauncher.Instance.Contains(stockToolbarButton, out hidden))
-            {
-                ApplicationLauncher.Instance.DetermineVisibility(stockToolbarButton);
-            }
-        }
+            if (VisibleinScenes == visibleinScenes)
+                return;
+            VisibleinScenes = visibleinScenes;
 
-        /// <summary>
-        /// Call this to change from AppLauncher to Toobar or vice-versa.
-        /// Will Destroy ToolBar or AppLauncher Icon and create a new one.
-        /// </summary>
-        /// <param name="stock">True if using AppLauncher, False if using ToolBar</param>
-        public void chgAppIconStockToolBar(bool stock)
-        {
-            if (!stock && ToolbarManager.ToolbarAvailable)
-            {
-                DestroyStockButton();
-                DestroyToolBar();
-                CreateToolBar();
-                usingToolbar = true;
-                usingStock = false;
-
-            }
-            else
-            {
-                DestroyToolBar();
-                DestroyStockButton();
-                CreateStockButton();
-                usingToolbar = false;
-                usingStock = true;
-            }
-        }
-
-        /// <summary>
-        /// Change the ToolBar TexturePath - to say change the Icon
-        /// </summary>
-        /// <param name="icontoSet">string in ToolBar TexturePath format</param>
-        public void setToolBarTexturePath(string icontoSet)
-        {
-            button1.TexturePath = icontoSet;
-        }
-
-        /// <summary>
-        /// Change the AppLauncher Icon Texture - to say change the Icon
-        /// </summary>
-        /// <param name="icontoSet">Texture to set Icon to</param>
-        public void setAppLauncherTexture(Texture icontoSet)
-        {
-            stockToolbarButton.SetTexture(icontoSet);
+            toolbarControl.OnDestroy();
+            UnityEngine.Object.Destroy(toolbarControl);
+            CreateToolbar();
         }
     }
 }

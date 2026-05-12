@@ -15,6 +15,7 @@
  *
  */
 
+using ClickThroughFix;
 using KSP.Localization;
 using KSP.UI.Screens;
 using RSTUtils;
@@ -28,6 +29,8 @@ namespace DF
 {
     internal class DeepFreezeGUI : MonoBehaviour, Savable
     {
+        public static DeepFreezeGUI Instance = null;
+
         //GUI Properties
         internal AppLauncherToolBar DFMenuAppLToolBar;
         private float DFWINDOW_WIDTH = 500;
@@ -48,7 +51,6 @@ namespace DF
         private Vector2 GUIscrollViewVector, GUIscrollViewVector2,// GUIscrollViewVectorSettings,
             GUIscrollViewVectorKAC, GUIscrollViewVectorKACKerbals = Vector2.zero;
         private bool mouseDownDF;
-        //private bool mouseDownCF;
         private bool mouseDownKAC;
         private float DFtxtWdthName;
         private float DFtxtWdthProf;
@@ -71,8 +73,6 @@ namespace DF
         private float DFvslRT;
 
         private bool showKACGUI;
-        //private bool showConfigGUI;
-        //private bool LoadConfig = true;
         private bool ModKACAlarm;
         private KACWrapper.KACAPI.KACAlarm KACalarmMod;
         private List<string> KACAlarm_FrzKbls = new List<string>();
@@ -89,7 +89,7 @@ namespace DF
         internal double chgECHeatsettingsTimer;
         private bool switchNextUpdate = false;
 
-        public bool Useapplauncher;
+
         private double currentTime;
 
         #region Cache Strings
@@ -255,6 +255,7 @@ namespace DF
 
         internal void Start()
         {
+            Instance = this;
             RSTUtils.Utilities.Log_Debug("DeepFreezeGUI startup");
             CacheLocalStrings();
             windowID = RSTUtils.Utilities.getnextrandomInt();
@@ -286,7 +287,6 @@ namespace DF
             DFvslLstUpd = Mathf.Round((DFWINDOW_WIDTH - 28f) * .18f);
             DFvslRT = Mathf.Round((DFWINDOW_WIDTH - 28f) * .12f);
 
-            Useapplauncher = DeepFreeze.Instance.DFsettings.UseAppLauncher;
 
             RSTUtils.Utilities.setScaledScreen();
 
@@ -299,15 +299,14 @@ namespace DF
                 GameDatabase.Instance.GetTexture("REPOSoftTech/DeepFreeze/Icons/DeepFreezeOff", false),
                 GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.SPACECENTER, GameScenes.TRACKSTATION);
 
-            //If Settings wants to use ToolBar mod, check it is installed and available. If not set the TST Setting to use Stock.
-            if (!ToolbarManager.ToolbarAvailable && !Useapplauncher)
-            {
-                Useapplauncher = true;
-            }
-
-            DFMenuAppLToolBar.Start(Useapplauncher);
+            DFMenuAppLToolBar.Start(false);
 
             RSTUtils.Utilities.Log_Debug("DeepFreezeGUI END startup");
+        }
+
+        void Destroy()
+        {
+            Instance = null;
         }
 
         private void FixedUpdate()
@@ -354,10 +353,15 @@ namespace DF
                     }
                 }
             }
-            if (Useapplauncher == false || !HighLogic.LoadedSceneIsFlight)
+            if (!HighLogic.LoadedSceneIsFlight)
             {
                 return;
             }
+        }
+
+        #region GUI
+        internal void UpdateToolbar()
+        {
             if (DFIntMemory.Instance != null)
             {
                 if (DFIntMemory.Instance.DpFrzrActVsl.Count == 0)
@@ -377,10 +381,8 @@ namespace DF
                                                              ApplicationLauncher.AppScenes.TRACKSTATION);
                 }
             }
+
         }
-
-        #region GUI
-
         private void OnGUI()
         {
             if (!Textures.StylesSet)
@@ -390,13 +392,13 @@ namespace DF
             {
 
                 DFVSwindowPos.ClampToScreen();
-                DFVSwindowPos = GUILayout.Window(VSwindowID, DFVSwindowPos, windowVS, cacheautoLOC_DF_00004, GUILayout.ExpandWidth(false),
+                DFVSwindowPos = ClickThruBlocker.GUILayoutWindow(VSwindowID, DFVSwindowPos, windowVS, cacheautoLOC_DF_00004, GUILayout.ExpandWidth(false),
                     GUILayout.ExpandHeight(true), GUILayout.Width(320), GUILayout.MinHeight(100));
             }
             if (showUnabletoSwitchVessel && !switchVesselManual)
             {
                 DFVSFwindowPos.ClampToScreen();
-                DFVSFwindowPos = GUILayout.Window(VSFwindowID, DFVSFwindowPos, windowVSF, cacheautoLOC_DF_00005, GUILayout.ExpandWidth(false),
+                DFVSFwindowPos = ClickThruBlocker.GUILayoutWindow(VSFwindowID, DFVSFwindowPos, windowVSF, cacheautoLOC_DF_00005, GUILayout.ExpandWidth(false),
                     GUILayout.ExpandHeight(true), GUILayout.Width(320), GUILayout.MinHeight(100));
             }
             if (switchVesselManual)
@@ -415,13 +417,13 @@ namespace DF
             {
                 GUI.skin = HighLogic.Skin;
                 DFwindowPos.ClampInsideScreen();
-                DFwindowPos = GUILayout.Window(windowID, DFwindowPos, windowDF, cacheautoLOC_DF_00006, GUILayout.ExpandWidth(true),
+                DFwindowPos = ClickThruBlocker.GUILayoutWindow(windowID, DFwindowPos, windowDF, cacheautoLOC_DF_00006, GUILayout.ExpandWidth(true),
                         GUILayout.ExpandHeight(true), GUILayout.MinWidth(200), GUILayout.MinHeight(250));
 
                 if (showKACGUI)
                 {
                     DFKACwindowPos.ClampInsideScreen();
-                    DFKACwindowPos = GUILayout.Window(KACwindowID, DFKACwindowPos, windowKAC, cacheautoLOC_DF_00007, GUILayout.ExpandWidth(true),
+                    DFKACwindowPos = ClickThruBlocker.GUILayoutWindow(KACwindowID, DFKACwindowPos, windowKAC, cacheautoLOC_DF_00007, GUILayout.ExpandWidth(true),
                         GUILayout.ExpandHeight(true), GUILayout.MinWidth(360), GUILayout.MinHeight(150));
                 }
             }
@@ -1010,7 +1012,8 @@ namespace DF
                                         bool FrzCrew = KACAlarm_FrzKbls.Contains(crew.Key);
                                         GUILayout.Label(crew.Key, Textures.frozenStyle, GUILayout.Width(KACtxtWdthKName));
                                         GUILayout.Label(crew.Value.experienceTraitName, Textures.frozenStyle, GUILayout.Width(KACtxtWdthKTyp));
-                                        if (FrzCrew) GUI.enabled = false;
+                                        if (FrzCrew) 
+                                            GUI.enabled = false;
                                         ThawCrew = GUILayout.Toggle(ThawCrew, "", Textures.ButtonStyle, GUILayout.Width(KACtxtWdthKTg1));
                                         GUI.enabled = true;
                                         if (ThawCrew)

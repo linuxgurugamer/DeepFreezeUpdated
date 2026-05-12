@@ -114,7 +114,6 @@ namespace RSTUtils
 			{
 				return GameState.SPACECENTER;
 			}
-			//if (FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)  // Check if in flight
 			if (HighLogic.LoadedSceneIsFlight)
 			{
 				if (FlightGlobals.fetch != null)
@@ -1029,13 +1028,13 @@ namespace RSTUtils
 
 		public static int scaledScreenHeight = 1;
 		public static int scaledScreenWidth = 1;
-		private static bool scaledScreenset;
+		//private static bool scaledScreenset;
 
         public static void setScaledScreen()
 		{
 			scaledScreenHeight = Mathf.RoundToInt(Screen.height / 1);
 			scaledScreenWidth = Mathf.RoundToInt(Screen.width / 1);
-			scaledScreenset = true;
+			//scaledScreenset = true;
 		}
 
         public static RectOffset SetRectOffset(RectOffset tmpRectOffset, int intValue)

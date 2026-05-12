@@ -41,12 +41,15 @@
       <HintPath>$(KSPDIR)\GameData\REPOSoftTech\BackgroundResources\BackgroundResources.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="ToolbarControl">
+      <HintPath>R:\KSP\KSP_1.12.5-dev\GameData\001_ToolbarControl\Plugins\ToolbarControl.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppLauncherToolBarExtension.cs" />
     <Compile Include="RectExtentions.cs" />
+    <Compile Include="RegisterToolbar.cs" />
     <Compile Include="RSTutilities.cs" />
-    <Compile Include="ToolBarManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
