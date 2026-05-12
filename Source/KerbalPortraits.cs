@@ -15,7 +15,10 @@
  *
  */
 using KSP.UI.Screens.Flight;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
+using static KSP.UI.Screens.Flight.KerbalPortraitGallery;
 
 
 namespace DeepFreeze
@@ -23,6 +26,17 @@ namespace DeepFreeze
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     class DFPortraits : MonoBehaviour
     {
+        static List<ActiveCrewItem> activeCrew;
+
+        void Start()
+        {
+            FieldInfo fi = typeof(KerbalPortraitGallery).GetField(
+                "activeCrew",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            activeCrew = (List<ActiveCrewItem>)fi.GetValue(KerbalPortraitGallery.Instance);
+        }
+
         internal static bool HasPortrait(Kerbal crew, bool checkName = false)
         {
             if (!checkName)
@@ -49,20 +63,41 @@ namespace DeepFreeze
         {
             if (!checkName)
             {
+#if false
                 for (int i = 0; i < KerbalPortraitGallery.Instance.ActiveCrew.Count; ++i)
                 {
                     if (KerbalPortraitGallery.Instance.ActiveCrew[i] == crew)
                         return true;
                 }
+#endif
+
+                for (int i = 0; i < activeCrew.Count; ++i)
+                {
+                    if (activeCrew[i].kerbal == crew)
+                        return true;
+                }
+
+
                 return false;
             }
             else
             {
+#if false
                 for (int i = 0; i < KerbalPortraitGallery.Instance.ActiveCrew.Count; ++i)
                 {
                     if (KerbalPortraitGallery.Instance.ActiveCrew[i].crewMemberName == crew.crewMemberName)
                         return true;
                 }
+#endif
+
+                for (int i = 0; i < activeCrew.Count; ++i)
+                {
+                    if (activeCrew[i].kerbal.crewMemberName == crew.crewMemberName)
+                        return true;
+                }
+
+
+
                 return false;
             }
         }
@@ -79,6 +114,7 @@ namespace DeepFreeze
             kerbal.SetVisibleInPortrait(false);
             kerbal.state = Kerbal.States.NO_SIGNAL;
             //Loop through the ActiveCrew portrait List
+#if false
             for (int i = KerbalPortraitGallery.Instance.ActiveCrew.Count - 1; i >= 0; i--)
             {
                 //If we find an ActiveCrew entry where the crewMemberName is equal to our kerbal's
@@ -88,6 +124,19 @@ namespace DeepFreeze
                     KerbalPortraitGallery.Instance.ActiveCrew.RemoveAt(i);
                 }
             }
+#endif
+
+            for (int i = activeCrew.Count - 1; i >= 0; i--)
+            {
+                //If we find an ActiveCrew entry where the crewMemberName is equal to our kerbal's
+                if (activeCrew[i].kerbal.crewMemberName == kerbal.crewMemberName)
+                {
+                    //we Remove them from the list.
+                    activeCrew.RemoveAt(i);
+                }
+            }
+
+
             //Portraits List clean-up.
             KerbalPortraitGallery.Instance.DespawnInactivePortraits(); //Despawn any portraits where CrewMember == null
             KerbalPortraitGallery.Instance.DespawnPortrait(kerbal); //Despawn our Kerbal's portrait
@@ -118,6 +167,7 @@ namespace DeepFreeze
                     kerbal.randomizeOnStartup = false;
                     kerbal.Start();
                 }
+
                 kerbal.state = Kerbal.States.ALIVE;
             }
         }

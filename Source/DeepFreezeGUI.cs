@@ -15,15 +15,14 @@
  *
  */
 
+using KSP.Localization;
+using KSP.UI.Screens;
+using RSTUtils;
+using RSTUtils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RSTUtils;
-using static RSTUtils.Utilities;
 using UnityEngine;
-using KSP.UI.Screens;
-using RSTUtils.Extensions;
-using KSP.Localization;
 
 namespace DF
 {
@@ -78,7 +77,7 @@ namespace DF
         private KACWrapper.KACAPI.KACAlarm KACalarmMod;
         private List<string> KACAlarm_FrzKbls = new List<string>();
         private List<string> KACAlarm_ThwKbls = new List<string>();
-        
+
         //SwitchVessel vars
         private bool showUnabletoSwitchVessel;
         private bool showSwitchVessel;
@@ -89,7 +88,7 @@ namespace DF
         internal bool chgECHeatsettings;
         internal double chgECHeatsettingsTimer;
         private bool switchNextUpdate = false;
-        
+
         public bool Useapplauncher;
         private double currentTime;
 
@@ -245,7 +244,7 @@ namespace DF
             cacheautoLOC_DF_00141 = Localizer.Format("#autoLOC_DF_00141");
             cacheautoLOC_DF_00142 = Localizer.Format("#autoLOC_DF_00142");
             cacheautoLOC_DF_00143 = Localizer.Format("#autoLOC_DF_00143");
-    }
+        }
 
         #endregion
 
@@ -290,7 +289,7 @@ namespace DF
             Useapplauncher = DeepFreeze.Instance.DFsettings.UseAppLauncher;
 
             RSTUtils.Utilities.setScaledScreen();
-            
+
             DFMenuAppLToolBar = new AppLauncherToolBar("DeepFreeze", cacheautoLOC_DF_00003,
                 "REPOSoftTech/DeepFreeze/Icons/DFtoolbar",
                 ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT |
@@ -307,10 +306,10 @@ namespace DF
             }
 
             DFMenuAppLToolBar.Start(Useapplauncher);
-            
+
             RSTUtils.Utilities.Log_Debug("DeepFreezeGUI END startup");
         }
-        
+
         private void FixedUpdate()
         {
             if (Time.timeSinceLevelLoad < 2f) return; //Wait 2 seconds on level load before executing
@@ -324,7 +323,7 @@ namespace DF
                 }
             }
         }
-        
+
         private void Update()
         {
             if (Time.timeSinceLevelLoad < 2f) return; //Wait 2 seconds on level load before executing
@@ -341,7 +340,7 @@ namespace DF
                 }
                 else
                 {
-                    
+
                     if (HighLogic.LoadedSceneIsFlight)
                     {
                         FlightGlobals.SetActiveVessel(switchVessel);
@@ -418,7 +417,7 @@ namespace DF
                 DFwindowPos.ClampInsideScreen();
                 DFwindowPos = GUILayout.Window(windowID, DFwindowPos, windowDF, cacheautoLOC_DF_00006, GUILayout.ExpandWidth(true),
                         GUILayout.ExpandHeight(true), GUILayout.MinWidth(200), GUILayout.MinHeight(250));
-                
+
                 if (showKACGUI)
                 {
                     DFKACwindowPos.ClampInsideScreen();
@@ -430,7 +429,7 @@ namespace DF
             if (DeepFreeze.Instance.DFsettings.ToolTips)
                 RSTUtils.Utilities.DrawToolTip();
         }
-        
+
         private void windowDF(int id)
         {
             GUIContent closeContent = new GUIContent(Textures.BtnRedCross, cacheautoLOC_DF_00008); //"Close Window"
@@ -766,6 +765,11 @@ namespace DF
                 }
                 foreach (DeepFreezer frzr in DFIntMemory.Instance.DpFrzrActVsl)
                 {
+                    // Set the GUIdisabled here so it doesn't get set for each crew member.  It's expensive and with a lot
+                    // of kerbals (>20) on a fast system, there is a more than 50% drop in fps
+
+                    bool GUIdisabled = (frzr.DFIcrewXferFROMActive || frzr.DFIcrewXferTOActive || (DFInstalledMods.IsSMInstalled && frzr.IsCrewXferRunning)
+                                                        || frzr.IsFreezeActive || frzr.IsThawActive || (DFInstalledMods.IsRTInstalled && !DFInstalledMods.RTVesselConnected(DFIntMemory.Instance.ActVslID)));
                     List<ProtoCrewMember> crew = new List<ProtoCrewMember>();
                     for (int i = 0; i < frzr.part.protoModuleCrew.Count; i++)
                     {
@@ -774,15 +778,16 @@ namespace DF
                             crew.Add(frzr.part.protoModuleCrew[i]);
                         }
                     }
-                    for (int i =0; i < crew.Count; i++)
-                    { 
+                    for (int i = 0; i < crew.Count; i++)
+                    {
                         GUILayout.BeginHorizontal();
                         GUILayout.Label(crew[i].name, Textures.statusStyle, GUILayout.Width(DFtxtWdthName));
                         GUILayout.Label(crew[i].experienceTrait.Title, Textures.statusStyle, GUILayout.Width(DFtxtWdthProf));
                         GUILayout.Label(frzr.part.vessel.vesselName, Textures.statusStyle, GUILayout.Width(DFtxtWdthVslN));
-                        
-                        if (frzr.DFIcrewXferFROMActive || frzr.DFIcrewXferTOActive || (DFInstalledMods.IsSMInstalled && frzr.IsCrewXferRunning)
-                                                    || frzr.IsFreezeActive || frzr.IsThawActive || (DFInstalledMods.IsRTInstalled && !DFInstalledMods.RTVesselConnected(DFIntMemory.Instance.ActVslID)))
+
+                        //if (frzr.DFIcrewXferFROMActive || frzr.DFIcrewXferTOActive || (DFInstalledMods.IsSMInstalled && frzr.IsCrewXferRunning)
+                        //                            || frzr.IsFreezeActive || frzr.IsThawActive || (DFInstalledMods.IsRTInstalled && !DFInstalledMods.RTVesselConnected(DFIntMemory.Instance.ActVslID)))
+                        if (GUIdisabled)
                         {
                             GUI.enabled = false;
                         }
@@ -791,7 +796,7 @@ namespace DF
                             frzr.beginFreezeKerbal(crew[i]);
                         }
                         GUI.enabled = true;
-                        
+
                         GUILayout.EndHorizontal();
                     }
                 }
@@ -809,7 +814,7 @@ namespace DF
                     showKACGUI = !showKACGUI;
                 }
             }
-            
+
             GUIContent resizeContent = new GUIContent(Textures.BtnResize, cacheautoLOC_DF_00046); //"Resize Window"
             Rect resizeRect = new Rect(DFwindowPos.width - 21, DFwindowPos.height - 22, 16, 16);
             GUI.Label(resizeRect, resizeContent, Textures.ResizeStyle);
@@ -821,7 +826,7 @@ namespace DF
 
             GUI.DragWindow();
         }
-        
+
         private void windowKAC(int id)
         {
             GUIContent closeContent = new GUIContent(Textures.BtnRedCross, cacheautoLOC_DF_00008); //"Close Window"
@@ -1073,7 +1078,7 @@ namespace DF
             GUIContent resizeContent = new GUIContent(Textures.BtnResize, cacheautoLOC_DF_00046); //#autoLOC_DF_00046 = Resize Window
             Rect resizeRect = new Rect(DFKACwindowPos.width - 17, DFKACwindowPos.height - 17, 16, 16);
             GUI.Label(resizeRect, resizeContent, Textures.ResizeStyle);
-            
+
             HandleResizeEventsKAC(resizeRect);
             if (DeepFreeze.Instance.DFsettings.ToolTips)
                 RSTUtils.Utilities.SetTooltipText();
@@ -1086,7 +1091,7 @@ namespace DF
             TimeWarp.SetRate(0, true);
             if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ready && !FlightDriver.Pause)
                 FlightDriver.SetPause(true);
-            
+
             GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
             //GUILayout.Box(new GUIContent("ElectricCharge is running out on vessel, you must switch to the vessel now.", "Switch to DeepFreeze vessel required"), statusStyle, GUILayout.Width(280));
@@ -1184,7 +1189,7 @@ namespace DF
                 }
             }
         }
-        
+
         private void HandleResizeEventsKAC(Rect resizeRect)
         {
             var theEvent = Event.current;

@@ -19,3 +19,8 @@ Changelog
 
 1.31.0.2
 	Updated bulkheadprofile for the CRY-0300RFreezer to srf instead of size1
+
+1.31.0.3
+	Fixed problem in status window which causes huge FPS drop with a large number of kerbals.  On a 9850X3D system with 20 kerbals in freeze chambers, caused a 72% drop in FPS, from 180 down to 70
+	Replaced obsolete call to KerbalPortraitGallery.ActiveCrew with Reflection code to get the protected list KerbalPortraitGallery.activeCrew (a bit of an optimization)
+
