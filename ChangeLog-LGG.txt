@@ -30,3 +30,4 @@ Changelog
 	Added support for ClickThroughBlocker
 	Added support for ToolbarController, removing about 1000 lines of code and simplifying the mod
 		Both require new dependencies of the above
+	Renamed mod to DeepFreezeUpdated
