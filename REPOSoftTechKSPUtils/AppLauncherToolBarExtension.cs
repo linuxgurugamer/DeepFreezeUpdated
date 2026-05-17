@@ -30,8 +30,8 @@ namespace RSTUtils
     {
         public static AppLauncherToolBar Instance { get; private set; }
 
-        private ApplicationLauncher.AppScenes VisibleinScenes; //What scenes is the applauncher button seen in
-        private bool showHoverText = false; //Whether to show AppLauncher Hover Text or not.
+        private static ApplicationLauncher.AppScenes VisibleinScenes; //What scenes is the applauncher button seen in
+        //private bool showHoverText = false; //Whether to show AppLauncher Hover Text or not.
 
         private bool _gamePaused;
         public Boolean gamePaused
@@ -65,10 +65,12 @@ namespace RSTUtils
             }
         }
 
+#if false
         public bool ShowHoverText
         {
             get { return showHoverText; }
         }
+#endif
 
         private void GamePaused()
         {
@@ -101,10 +103,13 @@ namespace RSTUtils
         /// <param name="appbtnTexOFF">Texture reference for the AppLauncher OFF Icon</param>
         /// <param name="gameScenes">A list of GameScenes use for ToolBar icon visiblity</param>
         public AppLauncherToolBar(string toolBarName, string toolBarToolTip, string toolBarTexturePath,
-            ApplicationLauncher.AppScenes VisibleinScenes, UnityEngine.Texture appbtnTexON, UnityEngine.Texture appbtnTexOFF, params GameScenes[] gameScenes)
+            ApplicationLauncher.AppScenes VisibleinScenesValue, UnityEngine.Texture appbtnTexON, UnityEngine.Texture appbtnTexOFF, params GameScenes[] gameScenes)
         {
-            this.VisibleinScenes = VisibleinScenes;
-            CreateToolbar();
+            if (toolbarControl == null)
+            {
+                VisibleinScenes = VisibleinScenesValue;
+                CreateToolbar();
+            }
         }
 
         public const string MODID = "DeepFreeze";
@@ -114,8 +119,10 @@ namespace RSTUtils
 
         private void CreateToolbar()
         {
+            Debug.LogError("DeepFreeze.CreateToolbar 1");
             if (toolbarControl == null)
             {
+                Debug.LogError($"DeepFreeze.CreateToolbar 2, VisibleinScenes: {VisibleinScenes.ToString()}");
                 GameObject gm = new GameObject(MODID);
                 toolbarControl = gm.gameObject.AddComponent<ToolbarControl>();
                 toolbarControl.AddToAllToolbars(
@@ -172,12 +179,15 @@ namespace RSTUtils
         /// <param name="visible">True if set to visible, false will turn it off</param>
         public void setAppLSceneVisibility(ApplicationLauncher.AppScenes visibleinScenes)
         {
+            Debug.LogError($"DeepFreeze, setAppLSceneVisibility, visibleinScenes: {visibleinScenes.ToString()},  VisibleinScenes: {VisibleinScenes.ToString()}");
+
             if (VisibleinScenes == visibleinScenes)
                 return;
             VisibleinScenes = visibleinScenes;
-
+            Debug.LogError($"DeepFreeze, Trying to recreate button, VisibleinScenes: {VisibleinScenes.ToString()}");
             toolbarControl.OnDestroy();
             UnityEngine.Object.Destroy(toolbarControl);
+            toolbarControl = null;
             CreateToolbar();
         }
     }

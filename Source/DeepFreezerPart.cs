@@ -184,7 +184,7 @@ namespace DF
         {
             DeepFreezeGUI obj = DeepFreeze.Instance.GetComponent("DeepFreezeGUI") as DeepFreezeGUI;
             if (obj != null)
-                obj.DFMenuAppLToolBar.GuiVisible = !obj.DFMenuAppLToolBar.GuiVisible;
+                DeepFreezeGUI.DFMenuAppLToolBar.GuiVisible = !DeepFreezeGUI.DFMenuAppLToolBar.GuiVisible;
             else
                 RSTUtils.Utilities.Log("DeepFreezer ToggleMenu error");
         }
@@ -1606,7 +1606,7 @@ namespace DF
 
         public override void OnStart(StartState state)
         {
-            Debug.Log("DeepFreezer OnStart");
+            //Debug.Log("DeepFreezer OnStart");
             base.OnStart(state);
             //Set the GameEvents we are interested in
             if (HighLogic.LoadedSceneIsFlight)
@@ -1798,7 +1798,7 @@ namespace DF
 
             timeLoadedOffrails = Planetarium.GetUniversalTime();
             IsRTInstalled = DFInstalledMods.IsRTInstalled;
-            Debug.Log("DeepFreezer  END OnStart");
+            //Debug.Log("DeepFreezer  END OnStart");
         }
 
         public override void OnSave(ConfigNode node)
@@ -1814,7 +1814,7 @@ namespace DF
         private void OnDestroy()
         {
             //Remove GameEvent callbacks.
-            Debug.Log("DeepFreezerPart OnDestroy");
+            //Debug.Log("DeepFreezerPart OnDestroy");
             
             if (GameEvents.onCrewTransferPartListCreated != null)
                 GameEvents.onCrewTransferPartListCreated.Remove(onCrewTransferPartListCreated);
@@ -1845,7 +1845,7 @@ namespace DF
                     onATPPodSettingChanged.Remove(OnATPPodSettingChanged);
                 }
             
-            Debug.Log("DeepFreezer END OnDestroy");
+            //Debug.Log("DeepFreezer END OnDestroy");
         }
 
         private void OnVesselSwitching(Vessel oldVsl, Vessel newVsl)

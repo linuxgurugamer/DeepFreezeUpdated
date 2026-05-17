@@ -1539,7 +1539,7 @@ namespace RSTUtils
 		{
 			if (debuggingOn)
 			{
-				Log("DEBUG: " + Message, strParams);
+				Log("DeepFreeze DEBUG: " + Message, strParams);
 			}
 		}
 		

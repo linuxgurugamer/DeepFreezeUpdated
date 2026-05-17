@@ -32,7 +32,7 @@ namespace DF
         public static DeepFreezeGUI Instance = null;
 
         //GUI Properties
-        internal AppLauncherToolBar DFMenuAppLToolBar;
+        internal static AppLauncherToolBar DFMenuAppLToolBar = null;
         private float DFWINDOW_WIDTH = 500;
         //private float CFWINDOW_WIDTH = 340;
         private float KACWINDOW_WIDTH = 500;
@@ -290,15 +290,17 @@ namespace DF
 
             RSTUtils.Utilities.setScaledScreen();
 
-            DFMenuAppLToolBar = new AppLauncherToolBar("DeepFreeze", cacheautoLOC_DF_00003,
-                "REPOSoftTech/DeepFreeze/Icons/DFtoolbar",
-                ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT |
-                ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB |
-                ApplicationLauncher.AppScenes.TRACKSTATION,
-                GameDatabase.Instance.GetTexture("REPOSoftTech/DeepFreeze/Icons/DeepFreezeOn", false),
-                GameDatabase.Instance.GetTexture("REPOSoftTech/DeepFreeze/Icons/DeepFreezeOff", false),
-                GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.SPACECENTER, GameScenes.TRACKSTATION);
-
+            if (DFMenuAppLToolBar == null)
+            {
+                DFMenuAppLToolBar = new AppLauncherToolBar("DeepFreeze", cacheautoLOC_DF_00003,
+                    "REPOSoftTech/DeepFreeze/Icons/DFtoolbar",
+                    ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT |
+                    ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB |
+                    ApplicationLauncher.AppScenes.TRACKSTATION,
+                    GameDatabase.Instance.GetTexture("REPOSoftTech/DeepFreeze/Icons/DeepFreezeOn", false),
+                    GameDatabase.Instance.GetTexture("REPOSoftTech/DeepFreeze/Icons/DeepFreezeOff", false),
+                    GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.SPACECENTER, GameScenes.TRACKSTATION);
+            }
             DFMenuAppLToolBar.Start(false);
 
             RSTUtils.Utilities.Log_Debug("DeepFreezeGUI END startup");
