@@ -643,12 +643,12 @@ namespace DF
                     if (DeepFreeze.Instance.DFsettings.TempinKelvin)
                     {
                         Fields["CabinTemp"].guiUnits = Localizer.Format("#autoLOC_DF_00061"); //#autoLOC_DF_00061 = K
-                        CabinTemp = (float)part.temperature;
+                        CabinTemp = (float)GetSystemTemp();
                     }
                     else
                     {
                         Fields["CabinTemp"].guiUnits = Localizer.Format("#autoLOC_DF_00070"); //#autoLOC_DF_00070 = C
-                        CabinTemp = RSTUtils.Utilities.KelvintoCelsius((float)part.temperature);
+                        CabinTemp = RSTUtils.Utilities.KelvintoCelsius((float)GetSystemTemp());
                     }
 
                     // If RemoteTech installed set the connection status
@@ -1382,6 +1382,33 @@ namespace DF
             //RSTUtils.Utilities.Log_Debug("ChkOngoingEC end");
         }
 
+        private double GetSystemTemp() {
+            if (DFInstalledMods.IsSystemHeatInstalled) {
+              var shModule = part.Modules["ModuleSystemHeat"];
+              var foo = shModule.Fields["currentLoopTemperature"];
+              return (float)foo.GetValue(shModule);
+            } else {
+              return part.temperature;
+            }
+        }
+
+        private void AddThermalFlux(double heatamt) {
+            if (DFInstalledMods.IsSystemHeatInstalled) {
+                PartModule targetModule = part.Modules["ModuleSystemHeat"];
+                SystemHeatWrapper.AddFlux(targetModule, "DeepFreezeLoopSystemHeat", 30, (float)heatamtMonitoringFrznKerbals * TotalFrozen, true);
+            } else {
+                part.AddThermalFlux(heatamt);
+            }
+        }
+
+        private void UpdateHeatFlux() {
+          if (DFInstalledMods.IsSystemHeatInstalled) {
+              PartModule targetModule = part.Modules["ModuleSystemHeat"];
+              int isOneFrozen = (TotalFrozen > 0) ? 1 : 0;
+              SystemHeatWrapper.AddFlux(targetModule, "DeepFreezeLoopSystemHeat", 30*isOneFrozen, (float)heatamtMonitoringFrznKerbals * TotalFrozen, true);
+          }
+        }
+
         private void ChkOngoingTemp(PartInfo partInfo)
         {
             // The follow section of code checks Temperatures when we have RegTempReqd set to true in the master config file.
@@ -1398,16 +1425,16 @@ namespace DF
                 {
                     //Add Heat for equipment monitoring frozen kerbals
                     double heatamt = heatamtMonitoringFrznKerbals / 60.0f * timeperiod * TotalFrozen;
-                    if (heatamt > 0) part.AddThermalFlux(heatamt);
+                    if (heatamt > 0) AddThermalFlux(heatamt);
                     RSTUtils.Utilities.Log_Debug("Added " + heatamt + " kW of heat for monitoring " + TotalFrozen + " frozen kerbals");
-                    if (part.temperature < DeepFreeze.Instance.DFsettings.RegTempMonitor)
+                    if (GetSystemTemp() < DeepFreeze.Instance.DFsettings.RegTempMonitor)
                     {
-                        RSTUtils.Utilities.Log_Debug("DeepFreezer Temperature check is good parttemp=" + part.temperature + ",MaxTemp=" + DeepFreeze.Instance.DFsettings.RegTempMonitor);
+                        RSTUtils.Utilities.Log_Debug("DeepFreezer Temperature check is good parttemp=" + GetSystemTemp() + ",MaxTemp=" + DeepFreeze.Instance.DFsettings.RegTempMonitor);
                         if (TempChkMsg != null) ScreenMessages.RemoveMessage(TempChkMsg);
                         _FrzrTmp = FrzrTmpStatus.OK;
                         tmpdeathCounter = currenttime;
                         // do warning if within 40 and 20 kelvin
-                        double tempdiff = DeepFreeze.Instance.DFsettings.RegTempMonitor - part.temperature;
+                        double tempdiff = DeepFreeze.Instance.DFsettings.RegTempMonitor - GetSystemTemp();
                         if (tempdiff <= 40)
                         {
                             _FrzrTmp = FrzrTmpStatus.WARN;
@@ -1427,7 +1454,7 @@ namespace DF
                     else
                     {
                         // OVER TEMP I'm Melting!!!!
-                        Debug.Log("DeepFreezer Part Temp TOO HOT, Kerbals are going to melt parttemp=" + part.temperature);
+                        Debug.Log("DeepFreezer Part Temp TOO HOT, Kerbals are going to melt parttemp=" + GetSystemTemp());
                         if (!partInfo.TempWarning)
                         {
                             if (TimeWarp.CurrentRateIndex > 1) RSTUtils.Utilities.stopWarp();
@@ -2030,7 +2057,7 @@ namespace DF
                         FreezeMsg = ScreenMessages.PostScreenMessage(Localizer.Format("#autoLOC_DF_00082", StoredCharge.ToString("######0"))); //#autoLOC_DF_00082 = \u0020Cryopod - Charging: <<1>>
                         if (DeepFreeze.Instance.DFsettings.RegTempReqd)
                         {
-                            part.AddThermalFlux(heatamtThawFreezeKerbal);
+                            AddThermalFlux(heatamtThawFreezeKerbal);
                         }
                         RSTUtils.Utilities.Log_Debug("DeepFreezer Drawing Charge StoredCharge =" + StoredCharge.ToString("0000.00") + " ChargeRequired =" + ChargeRequired);
                         if (StoredCharge >= ChargeRequired)
@@ -2245,9 +2272,9 @@ namespace DF
                     {
                         if (DeepFreeze.Instance.DFsettings.RegTempReqd) // Temperature check is required
                         {
-                            if ((float)part.temperature > DeepFreeze.Instance.DFsettings.RegTempFreeze)
+                            if ((float)GetSystemTemp() > DeepFreeze.Instance.DFsettings.RegTempFreeze)
                             {
-                                ScreenMessages.PostScreenMessage(Localizer.Format("#autoLOC_DF_00084", (DeepFreeze.Instance.DFsettings.TempinKelvin ? DeepFreeze.Instance.DFsettings.RegTempFreeze.ToString("######0") : (DeepFreeze.Instance.DFsettings.RegTempFreeze - 273.15d).ToString("######0")) + Fields["CabinTemp"].guiUnits), 5.0f, ScreenMessageStyle.UPPER_CENTER); //#autoLOC_DF_00084 = Cannot Freeze while Temperature greater than <<1>> 
+                                ScreenMessages.PostScreenMessage(Localizer.Format("#autoLOC_DF_00084", (DeepFreeze.Instance.DFsettings.TempinKelvin ? DeepFreeze.Instance.DFsettings.RegTempFreeze.ToString("######0") : (DeepFreeze.Instance.DFsettings.RegTempFreeze - 273.15d).ToString("######0")) + Fields["CabinTemp"].guiUnits), 5.0f, ScreenMessageStyle.UPPER_CENTER); //#autoLOC_DF_00084 = Cannot Freeze while Temperature greater than <<1>>
                                 return;
                             }
                         }
@@ -2584,7 +2611,7 @@ namespace DF
 
                         if (DeepFreeze.Instance.DFsettings.RegTempReqd)
                         {
-                            part.AddThermalFlux(heatamtThawFreezeKerbal);
+                            AddThermalFlux(heatamtThawFreezeKerbal);
                         }
                         if (StoredCharge >= ChargeRequired)
                         {
