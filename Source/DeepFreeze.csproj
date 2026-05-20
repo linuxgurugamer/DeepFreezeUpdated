@@ -90,6 +90,7 @@
     <Compile Include="APIs\SMWrapper.cs" />
     <Compile Include="APIs\TRWrapper.cs" />
     <Compile Include="APIs\USIWrapper.cs" />
+    <Compile Include="APIs\SystemHeatWrapper.cs" />
     <Compile Include="SettingsParms.cs" />
     <Compile Include="Textures.cs" />
     <Compile Include="VesselInfo.cs" />

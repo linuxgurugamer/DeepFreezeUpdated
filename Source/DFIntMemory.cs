@@ -185,6 +185,10 @@ namespace DF
                 {
                     SMWrapper.InitSMWrapper();
                 }
+                if (DFInstalledMods.IsSystemHeatInstalled)
+                {
+                    SystemHeatWrapper.InitSystemHeatWrapper();
+                }
             }
             if (DFInstalledMods.IsRTInstalled)
             {
