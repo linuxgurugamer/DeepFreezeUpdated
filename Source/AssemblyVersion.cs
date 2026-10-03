@@ -7,3 +7,4 @@
 
  [assembly: AssemblyVersion("1.33.0.3")]
  [assembly: AssemblyFileVersion("1.33.0.3")]
+ [assembly: KSPAssembly("DeepFreeze", 1, 33)]
