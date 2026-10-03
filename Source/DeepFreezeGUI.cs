@@ -452,8 +452,11 @@ namespace DF
             GUILayout.EndHorizontal();
             foreach (KeyValuePair<uint, PartInfo> frzr in DeepFreeze.Instance.DFgameSettings.knownFreezerParts)
             {
+                // The vessel may already be gone (destroyed) while its freezer part is still listed
+                VesselInfo vsl;
+                if (!DeepFreeze.Instance.DFgameSettings.knownVessels.TryGetValue(frzr.Value.vesselID, out vsl))
+                    continue;
                 GUILayout.BeginHorizontal();
-                VesselInfo vsl = DeepFreeze.Instance.DFgameSettings.knownVessels[frzr.Value.vesselID];
                 GUILayout.Label(vsl.vesselName, Textures.statusStyle, GUILayout.Width(DFvslWdthName));
                 string partname = string.Empty;
                 if (frzr.Value.PartName.Substring(8, 1) == "R")
