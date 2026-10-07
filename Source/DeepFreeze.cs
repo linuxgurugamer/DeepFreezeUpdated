@@ -330,13 +330,9 @@ namespace DF
         protected void onVesselTerminated(ProtoVessel vessel)
         {
             RSTUtils.Utilities.Log("DeepFreezeEvents onVesselTerminated " + vessel.vesselID);
-            foreach (KeyValuePair<string, KerbalInfo> kerbal in Instance.DFgameSettings.KnownFrozenKerbals)
-            {
-                if (kerbal.Value.vesselID == vessel.vesselID)
-                {
-                    KillFrozenCrew(kerbal.Key);
-                }
-            }
+            // KillFrozenCrew removes the kerbal from KnownFrozenKerbals, so collect the names first
+            var crewToKill = Instance.DFgameSettings.KnownFrozenKerbals.Where(e => e.Value.vesselID == vessel.vesselID).Select(e => e.Key).ToList();
+            crewToKill.ForEach(name => KillFrozenCrew(name));
             var alarmsToDelete = new List<string>();
             alarmsToDelete.AddRange(Instance.DFgameSettings.knownKACAlarms.Where(e => e.Value.VesselID == vessel.vesselID).Select(e => e.Key).ToList());
             alarmsToDelete.ForEach(id => Instance.DFgameSettings.knownKACAlarms.Remove(id));
@@ -359,13 +355,9 @@ namespace DF
         protected void onVesselWillDestroy(Vessel vessel)
         {
             RSTUtils.Utilities.Log("DeepFreezeEvents onVesselWillDestroy " + vessel.id);
-            foreach (KeyValuePair<string, KerbalInfo> kerbal in Instance.DFgameSettings.KnownFrozenKerbals)
-            {
-                if (kerbal.Value.vesselID == vessel.id)
-                {
-                    KillFrozenCrew(kerbal.Key);
-                }
-            }
+            // KillFrozenCrew removes the kerbal from KnownFrozenKerbals, so collect the names first
+            var crewToKill = Instance.DFgameSettings.KnownFrozenKerbals.Where(e => e.Value.vesselID == vessel.id).Select(e => e.Key).ToList();
+            crewToKill.ForEach(name => KillFrozenCrew(name));
             var alarmsToDelete = new List<string>();
             alarmsToDelete.AddRange(Instance.DFgameSettings.knownKACAlarms.Where(e => e.Value.VesselID == vessel.id).Select(e => e.Key).ToList());
             alarmsToDelete.ForEach(id => Instance.DFgameSettings.knownKACAlarms.Remove(id));
@@ -472,7 +464,7 @@ namespace DF
                     }
                 }
                 else
-                    RSTUtils.Utilities.Log("DeepFreezeEvents " + crew.name + " couldn't find them to kill them.");
+                    RSTUtils.Utilities.Log("DeepFreezeEvents " + FrozenCrew + " couldn't find them to kill them.");
             }
         }
 
