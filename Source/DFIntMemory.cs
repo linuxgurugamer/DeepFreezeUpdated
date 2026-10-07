@@ -386,7 +386,7 @@ namespace DF
                     // Set Top Left messages for FreezerCam mode
 
                     // See if there is a kerbal seated/frozen in that seat get their reference
-                    IVAkerbalPod = new ScreenMessage(Localizer.Format("autoLOC_DF_00071", ActFrzrCams[lastFrzrCam].FrzrCamSeatIndex), 1, ScreenMessageStyle.UPPER_LEFT); //autoLOC_DF_00071 = Pod:<<1>>
+                    IVAkerbalPod = new ScreenMessage(Localizer.Format("#autoLOC_DF_00071", ActFrzrCams[lastFrzrCam].FrzrCamSeatIndex), 1, ScreenMessageStyle.UPPER_LEFT); //autoLOC_DF_00071 = Pod:<<1>>
                     IVAkerbalPod.color = Color.white;
                     ScreenMessages.PostScreenMessage(IVAkerbalPod);
                     IVAkerbalPart = new ScreenMessage(ActFrzrCams[lastFrzrCam].FrzrCamPartName, 1, ScreenMessageStyle.UPPER_LEFT);
