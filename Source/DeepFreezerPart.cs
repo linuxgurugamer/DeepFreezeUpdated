@@ -1357,7 +1357,7 @@ namespace DF
                 if (DeepFreeze.Instance.DFsettings.RegTempReqd)
                 {
                     Fields["freezerTempStatus"].guiActive = true;
-                    if (RSTUtils.Utilities.timewarpIsValid(2)) // Temperature is buggy in timewarp so it is disabled whenever timewarp is on.
+                    if (RSTUtils.Utilities.timewarpIsValid(2) && !vessel.packed) // Temperature is buggy in timewarp so it is disabled whenever timewarp is on, or the vessel is still on rails.
                     {
                         PartInfo partInfo;
                         if (!DeepFreeze.Instance.DFgameSettings.knownFreezerParts.TryGetValue(part.flightID, out partInfo))
@@ -1536,6 +1536,7 @@ namespace DF
                     {
                         // OVER TEMP I'm Melting!!!!
                         Debug.Log("DeepFreezer Part Temp TOO HOT, Kerbals are going to melt parttemp=" + part.temperature);
+                        timeSinceLastTmpChk = (float)currenttime; // heat for this period was already added above; don't add it again every frame
                         if (!partInfo.TempWarning)
                         {
                             if (TimeWarp.CurrentRateIndex > 1) RSTUtils.Utilities.stopWarp();
