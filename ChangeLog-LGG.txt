@@ -49,10 +49,15 @@ Changelog
 	Localized the R/T Connected in the PAW
 	Updated localization files for all included languages using translate.google.com
 
-1.33.0.3 (unreleased)
+1.33.0.3 
 	Fixed issue with transferring an unfrozen kerbal to a command pod where the SAS wasn't being reset properly
 	Thanks to github user @celino for these changes:
 		Fix KeyNotFoundException in the DeepFreeze window after a vessel is destroyed
 		Add missing #autoLOC_DF_00207 (Freezer Out of EC) to en-us localization
 		Add the KSPAssembly attribute so other mods can depend on DeepFreeze (accidentally removed in 1.32.0)
-	Added the missing #autoLOC_DF_00207 (Freezer Out of EC) to all the other localization files, using Google Translate to generate the text for the other languages
+		Fix freezer overheating (and exploding vessels) right after time warp
+		Fix exceptions when a vessel with frozen kerbals is destroyed or terminated
+		Fixed issue with transferring an unfrozen kerbal to a command pod where the SAS wasn't being reset properly
+		Add Brazilian Portuguese (pt-br) localization
+		Fix typos and wrong texts in the English localization
+	Added the missing #autoLOC_DF_00207 (Freezer Out of EC) to all the other localization files, using Google Translate to generate the text for the other languages.  Note:  @celino added them also, but only in english
